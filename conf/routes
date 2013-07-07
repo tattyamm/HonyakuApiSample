@@ -3,7 +3,7 @@
 # ~~~~
 
 # Home page
-GET     /translate                  controllers.Application.translate(text:String ?= "", from:String ?= "ja", to:String ?= "ja")
+GET     /translate                  controllers.Application.translate(text:String, from:String ?= "ja", to:String ?= "ja")
 GET     /                           controllers.Application.index(text:String ?= "", from:String ?= "ja", to:String ?= "ja")
 
 # Map static resources from the /public folder to the /assets URL path

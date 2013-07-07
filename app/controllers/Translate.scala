@@ -8,11 +8,17 @@ import play.api.cache.Cache
 import play.api.Play.current
 import scala.concurrent.duration.Duration
 import scala.xml.XML
+import ExecutionContext.Implicits.global
+import play.api.libs.concurrent.Akka
 
 
 object Translate {
 
   def translate(from: String, to: String, text: String): Future[String] = {
+    //TODO 例外処理
+    if(text=="" || to=="" || from==""){
+      return Akka.future {"(何か入力してください)"}
+    }
     val accessToken = Await.result(getAccessToken(), Duration.Inf)
     //翻訳結果は適当に長時間キャッシュする
     Cache.getOrElse[Future[String]](from + to + base64(text), 60 * 60 * 24) {
@@ -24,7 +30,7 @@ object Translate {
         response =>
           XML.loadString(response.body).text
       } recover {
-        //例外処理はここ
+        //TODO 例外処理
         case e: Exception => println("errr: " + e)
           ""
       }
@@ -43,10 +49,6 @@ object Translate {
       future.map {
         response =>
           (Json.parse(response.body) \ "access_token").as[String]
-      } recover {
-        //例外処理はここ
-        case e: Exception => println("errr: " + e)
-          ""
       }
     }
   }
@@ -55,9 +57,10 @@ object Translate {
    * 2013.05.24のリストに準拠
    * @param from
    * @param to
+   * @param text
    * @return
    */
-  def isTranslate(from: String, to: String): Boolean = {
+  def isTranslate(from: String, to: String, text:String): Boolean = {
     val LanguageCodes = List("ar", "bg", "ca", "zh-CHS", "zh-CHT", "cs", "da", "nl", "en", "et", "fa", "fi", "fr", "de", "el", "ht", "he", "hi", "hu", "id", "it", "ja", "ko", "lv", "lt", "ms", "mww", "no", "pl", "pt", "ro", "ru", "sk", "sl", "es", "sv", "th", "tr", "uk", "ur", "vi")
     if (from != to && LanguageCodes.contains(from) && LanguageCodes.contains(to)) {
       true
