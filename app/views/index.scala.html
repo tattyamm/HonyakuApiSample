@@ -1,7 +1,19 @@
-@(message: String)
+@(text:String, translated: String, reTranslated:String)
 
-@main("Welcome to Play 2.1") {
-    
-    @play20.welcome(message)
-    
+@main("再翻訳") {
+
+    <h1>翻訳元</h1>
+    <form action="/" method="get">
+        <textarea name="text" cols=50 rows=2>@text</textarea>
+        <input type="hidden" name="from" value="ja" />
+        <input type="hidden" name="to" value="en" />
+        <p><input type="submit" value="翻訳" /></p>
+    </form>
+
+    <h1>翻訳</h1>
+    <pre>@translated</pre>
+
+    <h1>再翻訳</h1>
+    <pre>@reTranslated</pre>
+
 }
