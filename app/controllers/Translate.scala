@@ -3,7 +3,6 @@ package controllers
 import play.api.libs.json._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import play.api.libs.ws.WS
-import ExecutionContext.Implicits.global
 import play.api.cache.Cache
 import play.api.Play.current
 import scala.concurrent.duration.Duration
@@ -21,7 +20,7 @@ object Translate {
     }
     val accessToken = Await.result(getAccessToken(), Duration.Inf)
     //翻訳結果は適当に長時間キャッシュする
-    Cache.getOrElse[Future[String]](from + to + base64(text), 60 * 60 * 24) {
+    Cache.getOrElse[Future[String]](from + to + Utility.md5Sum(text), 60 * 60 * 24) {
       val future = WS.url("http://api.microsofttranslator.com/V2/Http.svc/Translate")
         .withHeaders(("Authorization", "Bearer " + accessToken))
         .withQueryString(("from", from), ("to", to), ("text", text))
@@ -70,10 +69,12 @@ object Translate {
   }
 
   /*
-   * base64を生成する
+   * md5を生成する
    */
-  def base64(message: String): String = {
-    new sun.misc.BASE64Encoder().encode(message.getBytes())
+  def md5Sum(message: String): String = {
+    import java.security.MessageDigest
+    val digestedBytes = MessageDigest.getInstance("MD5").digest(message.getBytes)
+    digestedBytes.map("%02x".format(_)).mkString
   }
 }
 
