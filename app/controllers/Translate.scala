@@ -20,7 +20,7 @@ object Translate {
     }
     val accessToken = Await.result(getAccessToken(), Duration.Inf)
     //翻訳結果は適当に長時間キャッシュする
-    Cache.getOrElse[Future[String]](from + to + Utility.md5Sum(text), 60 * 60 * 24) {
+    //Cache.getOrElse[Future[String]](from + to + Utility.md5Sum(text), 60 * 60 * 24) {
       val future = WS.url("http://api.microsofttranslator.com/V2/Http.svc/Translate")
         .withHeaders(("Authorization", "Bearer " + accessToken))
         .withQueryString(("from", from), ("to", to), ("text", text))
@@ -33,7 +33,7 @@ object Translate {
         case e: Exception => println("errr: " + e)
           ""
       }
-    }
+    //}
   }
 
   private def getAccessToken(): Future[String] = {
