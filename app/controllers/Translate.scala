@@ -41,7 +41,7 @@ object Translate {
     Cache.getOrElse[Future[String]]("TranslationAccessToken", 60 * 10 - 30) {
       val future = WS.url("https://datamarket.accesscontrol.windows.net/v2/OAuth2-13").post(Map(
         "grant_type" -> Seq("client_credentials"),
-        "client_id" -> Seq("translate_trend"),
+        "client_id" -> Seq(Conf.translateClientId),
         "client_secret" -> Seq(Conf.translateClientSecret),
         "scope" -> Seq("http://api.microsofttranslator.com")
       ))
